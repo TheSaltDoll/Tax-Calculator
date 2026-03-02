@@ -197,6 +197,22 @@
   }
 
   /* === NUMBER INPUT (for Revenue) === */
+  .tax-mult-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 9px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 44px;
+    transition: all 0.25s ease;
+  }
+  .tax-mult-display.flash {
+    color: var(--green);
+    transform: scale(1.15);
+  }
   .num-input {
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
@@ -354,20 +370,24 @@
       </div>
     </div>
     <div class="param-row">
-      <div class="param-label">Tax Multiplier</div>
-      <div class="dropdown-wrap">
-        <select id="taxMultiplier">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5" selected>5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="9">9</option>
-          <option value="11">11</option>
-        </select>
+      <div class="param-label">Policy 4 (Healthcare)</div>
+      <div class="seg-control" data-param="policy4">
+        <button class="seg-btn" data-val="A">A</button>
+        <button class="seg-btn active" data-val="B">B</button>
+        <button class="seg-btn" data-val="C">C</button>
       </div>
+    </div>
+    <div class="param-row">
+      <div class="param-label">Policy 5 (Education)</div>
+      <div class="seg-control" data-param="policy5">
+        <button class="seg-btn" data-val="A">A</button>
+        <button class="seg-btn" data-val="B">B</button>
+        <button class="seg-btn active" data-val="C">C</button>
+      </div>
+    </div>
+    <div class="param-row">
+      <div class="param-label">Tax Multiplier</div>
+      <div class="tax-mult-display" id="taxMultiplierDisplay">5</div>
     </div>    
   </div>
 
@@ -436,13 +456,36 @@
   const state = {
     policy2: 'B',
     policy3: 'A',
+    policy4: 'B',
+    policy5: 'C',
     wcPop: 3,
     mcCompanies: 2,
     mcOps: 2,
     capOps: 3,
     capRevenue: 120,
-    taxMultiplier: 5
   };
+
+  // === TAX MULTIPLIER CALCULATION ===
+  const baseTaxMap = { A: 3, B: 2, C: 1 };
+  const nMap = { A: 2, B: 1, C: 0 };
+  const welfareMap = { A: 2, B: 1, C: 0 };
+
+  function calcTaxMultiplier() {
+    const base = baseTaxMap[state.policy3];
+    const n = nMap[state.policy3];
+    const health = welfareMap[state.policy4];
+    const edu = welfareMap[state.policy5];
+    return base + n * health + n * edu;
+  }
+
+  function updateTaxMultiplierDisplay() {
+    const el = document.getElementById('taxMultiplierDisplay');
+    el.textContent = calcTaxMultiplier();
+    el.classList.remove('flash');
+    el.offsetHeight; // reflow
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 300);
+  }
 
   // === TABLES ===
   // Working Class & Middle Class Income Tax table [policy2][policy3]
@@ -476,6 +519,9 @@
         ctrl.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state[param] = btn.dataset.val;
+        if (['policy3','policy4','policy5'].includes(param)) {
+          updateTaxMultiplierDisplay();
+        }
       });
     });
   });
@@ -524,13 +570,10 @@
     state.capRevenue = v;
   });
 
-  document.getElementById('taxMultiplier').addEventListener('change', e => {
-    state.taxMultiplier = parseInt(e.target.value);
-  });
-
   // === CALCULATE ===
   document.getElementById('calcBtn').addEventListener('click', () => {
-    const { policy2, policy3, wcPop, mcCompanies, mcOps, capOps, capRevenue, taxMultiplier } = state;
+    const { policy2, policy3, wcPop, mcCompanies, mcOps, capOps, capRevenue } = state;
+    const taxMultiplier = calcTaxMultiplier();
 
     // Working Class
     const wcRate = incomeTaxTable[policy2][policy3];
