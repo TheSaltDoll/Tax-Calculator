@@ -338,14 +338,6 @@
   <div class="section">
     <div class="section-title">Policies</div>
     <div class="param-row">
-      <div class="param-label">Policy 3 (Taxation)</div>
-      <div class="seg-control" data-param="policy3">
-        <button class="seg-btn active" data-val="A">A</button>
-        <button class="seg-btn" data-val="B">B</button>
-        <button class="seg-btn" data-val="C">C</button>
-      </div>
-    </div>
-    <div class="param-row">
       <div class="param-label">Policy 2 (Labor)</div>
       <div class="seg-control" data-param="policy2">
         <button class="seg-btn active" data-val="A">A</button>
@@ -353,6 +345,14 @@
         <button class="seg-btn" data-val="C">C</button>
       </div>
     </div>
+    <div class="param-row">
+      <div class="param-label">Policy 3 (Taxation)</div>
+      <div class="seg-control" data-param="policy3">
+        <button class="seg-btn active" data-val="A">A</button>
+        <button class="seg-btn" data-val="B">B</button>
+        <button class="seg-btn" data-val="C">C</button>
+      </div>
+    </div>    
   </div>
 
   <!-- Working Class -->
@@ -439,14 +439,14 @@
 <script>
   // === STATE ===
   const state = {
+    policy2: 'B',
     policy3: 'A',
-    policy2: 'A',
-    wcPop: 5,
-    mcCompanies: 0,
-    mcOps: 0,
-    capOps: 0,
-    capRevenue: 0,
-    taxMultiplier: 1
+    wcPop: 3,
+    mcCompanies: 2,
+    mcOps: 2,
+    capOps: 3,
+    capRevenue: 120,
+    taxMultiplier: 5
   };
 
   // === TABLES ===
